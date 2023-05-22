@@ -18,10 +18,17 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
     rgb(var(--background-start-rgb));
+}
+
+/* navbar tag */
+body > nav > a {
+  margin: 1rem;
+}
+
+body > nav > a:hover {
+  text-decoration-line: underline;
+  text-decoration-thickness: 3px;
+  color: #1355f0;
 }

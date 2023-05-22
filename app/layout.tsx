@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <nav className="">
+        <nav className="flex justify-center p-2 text-lg font-bold border-double border-b-4 border-slate-400">
           <Link href="/kanto">관동지방</Link>
           <Link href="/johto">성도지방</Link>
           <Link href="/hoenn">호연지방</Link>
