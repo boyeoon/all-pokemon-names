@@ -19,6 +19,7 @@ export async function getPokemonList() {
 // export default async function Kanto({ pokemonList }: PokemonGridProps) {
 export default async function Kanto() {
   const pokemonList = await getPokemonList();
+
   console.log(pokemonList);
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -33,12 +34,9 @@ export default async function Kanto() {
         </p>
       </div>
       <div>
-        {/* <input
-          type="text"
-          value={searchText}
-          id="pokemonName"
-          placeholder="포켓몬 이름을 적어주세요."
-        /> */}
+        {pokemonList.map((pokemon: any, index: any) => (
+          <p key={index}>{pokemon.name}</p>
+        ))}
       </div>
     </main>
   );
