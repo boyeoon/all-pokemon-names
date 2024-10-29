@@ -12,7 +12,7 @@ export default function Footer() {
           href={"https://github.com/boyeoon/all-pokemon-names"}
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:underline"
+          className="hover:text-primary hover:underline decoration-4"
         >
           GitHub
         </Link>
