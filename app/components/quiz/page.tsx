@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import { fetchPokemonData, PokeAPI } from "@/pokeapi";
 
-interface PokemonGuesserProps {
+interface PokemonQuizProps {
   numPokemonsStr: number;
   numPokemonsEnd: number;
 }
 
-export default function PokemonGuesser({
+export default function PokemonQuiz({
   numPokemonsStr,
   numPokemonsEnd,
-}: PokemonGuesserProps) {
+}: PokemonQuizProps) {
   const [pokemons, setPokemons] = useState<PokeAPI[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [matchedCount, setMatchedCount] = useState(0);
