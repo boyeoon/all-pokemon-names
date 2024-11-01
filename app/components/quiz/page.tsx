@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchPokemonData, PokeAPI } from "@/pokeapi";
+import Image from "next/image";
 
 interface PokemonQuizProps {
   numPokemonsStr: number;
@@ -105,10 +106,11 @@ export default function PokemonQuiz({
             {group.map((pokemon) => (
               <div key={pokemon.id} style={{ textAlign: "center" }}>
                 {sprites[pokemon.id] ? (
-                  <img
+                  <Image
                     src={sprites[pokemon.id]}
                     alt={pokemon.name}
                     width={60}
+                    height={60}
                   />
                 ) : (
                   <div
