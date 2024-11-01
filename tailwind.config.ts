@@ -11,8 +11,11 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        // primary: "#1355f0",
-        primary: "#ffcc00",
+        primary: "#1355f0",
+        // primary: "#ffcc00",
+      },
+      boxShadow: {
+        "3xl": "0 35px 60px -15px rgba(0, 0, 0, 0.3)",
       },
     },
   },
