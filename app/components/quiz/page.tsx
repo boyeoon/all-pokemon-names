@@ -18,6 +18,7 @@ export default function PokemonQuiz({
   const [matchedCount, setMatchedCount] = useState(0);
   const [sprites, setSprites] = useState<{ [key: string]: string }>({});
   const [itemsPerRow, setItemsPerRow] = useState(15); // 초기 설정
+  const [showIds, setShowIds] = useState(true); // 포켓몬 ID 표시 여부
 
   useEffect(() => {
     const loadPokemons = async () => {
@@ -92,41 +93,41 @@ export default function PokemonQuiz({
             {numPokemonsEnd - numPokemonsStr + 1 - matchedCount}마리
           </p>
         </div>
+        <button
+          onClick={() => setShowIds((prev) => !prev)}
+          className="p-2 text-white bg-green-500 rounded"
+        >
+          {showIds ? "ID 숨기기" : "ID 보이기"}
+        </button>
       </div>
       <div className="m-8 overflow-y-scroll border-4 rounded-lg border-slate-400 max-h-96">
         {groupPokemons().map((group, groupIndex) => (
-          <div
-            key={groupIndex}
-            style={{
-              display: "flex",
-              justifyContent: "space-around",
-              margin: "10px 0",
-            }}
-          >
+          <div key={groupIndex} className="flex m-2 justify-around">
             {group.map((pokemon) => (
-              <div key={pokemon.id} style={{ textAlign: "center" }}>
+              <div key={pokemon.id} className="text-center">
                 {sprites[pokemon.id] ? (
                   <Image
                     src={sprites[pokemon.id]}
                     alt={pokemon.name}
-                    width={60}
-                    height={60}
+                    width={64}
+                    height={64}
                   />
                 ) : (
-                  <div
-                    style={{
-                      width: 60,
-                      height: 60,
-                      backgroundColor: "#ccc",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <p style={{ margin: 0 }}>{pokemon.id}</p>
+                  <div className="relative flex justify-center">
+                    <Image
+                      src={"/pokeball.svg"}
+                      alt="pokeball"
+                      width={64}
+                      height={64}
+                    ></Image>
+                    {showIds && (
+                      <p className="absolute top-0 left-1/2 transform -translate-x-1/2 m-0 text-center ">
+                        {pokemon.id}
+                      </p>
+                    )}
                   </div>
                 )}
-                <p>{pokemon.name}</p>
+                {/* <p>{pokemon.name}</p> */}
               </div>
             ))}
           </div>
