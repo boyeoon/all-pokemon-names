@@ -9,8 +9,10 @@ export default function Kanto() {
           <rt className="tracking-[.5em] text-primary">2세대</rt>
         </ruby>
         &nbsp;
-        <span className="rounded bg-yellow-500/30 text-primary">100마리</span>의
-        포켓몬을 전부 알고있나요?
+        <span className="underline rounded text-primary decoration-wavy decoration-3">
+          100마리
+        </span>
+        의 포켓몬을 전부 알고있나요?
       </p>
       <PokemonQuiz numPokemonsStr={152} numPokemonsEnd={251} />
     </div>
