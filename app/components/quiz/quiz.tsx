@@ -91,7 +91,7 @@ export default function PokemonQuiz({
           />
           <button
             type="submit"
-            className="p-2 font-bold text-white rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70"
+            className="p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70"
           >
             맞추기
           </button>
@@ -99,7 +99,7 @@ export default function PokemonQuiz({
 
         <button
           onClick={() => setShowIds((prev) => !prev)}
-          className="p-2 font-bold text-white rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70"
+          className="p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70"
         >
           {showIds ? "도감 번호 숨기기" : "도감 번호 보이기"}
         </button>
@@ -123,9 +123,9 @@ export default function PokemonQuiz({
                       alt="pokeball"
                       width={64}
                       height={64}
-                    ></Image>
+                    />
                     {showIds && (
-                      <p className="absolute top-0 m-0 text-xs text-center transform -translate-x-1/2 left-1/2">
+                      <p className="absolute top-0 m-0 text-xs text-center transform -translate-x-1/2 left-1/2 text-[#FDFDFD] font-bold">
                         {pokemon.id}
                       </p>
                     )}
