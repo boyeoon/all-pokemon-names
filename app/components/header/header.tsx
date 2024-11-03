@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface LinkItem {
   href: string;
@@ -6,6 +9,8 @@ interface LinkItem {
 }
 
 export default function Header() {
+  const pathname = usePathname();
+
   const links: LinkItem[] = [
     { href: "/regions/kanto", label: "관동" },
     { href: "/regions/johto", label: "성도" },
@@ -26,7 +31,12 @@ export default function Header() {
           <li key={link.href}>
             <Link
               href={link.href}
-              className="text-lg font-bold hover:text-primary hover:underline decoration-4"
+              className={`text-lg font-bold ${
+                pathname === link.href
+                  ? "text-primary underline decoration-4"
+                  : "hover:text-primary hover:underline decoration-4"
+              }`}
+              // className="text-lg font-bold hover:text-primary hover:underline decoration-4"
             >
               {link.label}
             </Link>
