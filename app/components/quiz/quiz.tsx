@@ -17,8 +17,10 @@ export default function PokemonQuiz({
   const [inputValue, setInputValue] = useState("");
   const [matchedCount, setMatchedCount] = useState(0);
   const [sprites, setSprites] = useState<{ [key: string]: string }>({});
-  const [itemsPerRow, setItemsPerRow] = useState(15); // 초기 설정
-  const [showIds, setShowIds] = useState(true); // 포켓몬 id 표시 여부
+  const [itemsPerRow, setItemsPerRow] = useState(15); // 기본 가로로 보여줄 수
+  const [showIds, setShowIds] = useState(true); // 도감 번호 표시 여부
+  const [showLights, setShowLights] = useState(true); // 색깔 불빛 표시 여부
+  const [lightColor, setLightColor] = useState<string | null>(null); // 현재 색깔
 
   useEffect(() => {
     const loadPokemons = async () => {
@@ -54,14 +56,20 @@ export default function PokemonQuiz({
     const matchedPokemon = pokemons.find(
       (pokemon) => pokemon.name === inputValue.trim()
     );
+
     if (matchedPokemon) {
       setSprites((prevSprites) => ({
         ...prevSprites,
         [matchedPokemon.id]: matchedPokemon.sprites.front_default,
       }));
       setMatchedCount((prevCount) => prevCount + 1);
+      setLightColor("blue");
+    } else {
+      setLightColor("red");
     }
+
     setInputValue("");
+    setTimeout(() => setLightColor(null), 500);
   };
 
   const groupPokemons = () => {
@@ -103,39 +111,59 @@ export default function PokemonQuiz({
         >
           {showIds ? "도감 번호 숨기기" : "도감 번호 보이기"}
         </button>
+
+        <button
+          onClick={() => setShowLights((prev) => !prev)}
+          className="p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70"
+        >
+          {showLights ? "불빛 끄기" : "불빛 켜기"}
+        </button>
       </div>
-      <div className="m-8 overflow-y-scroll border-4 rounded-lg shadow-3xl border-slate-400 max-h-96">
-        {groupPokemons().map((group, groupIndex) => (
-          <div key={groupIndex} className="flex justify-around m-2">
-            {group.map((pokemon) => (
-              <div key={pokemon.id} className="text-center">
-                {sprites[pokemon.id] ? (
-                  <Image
-                    src={sprites[pokemon.id]}
-                    alt={pokemon.name}
-                    width={64}
-                    height={64}
-                  />
-                ) : (
-                  <div className="relative flex justify-center">
+
+      <div className="flex m-8">
+        <div
+          id="canvas"
+          className={`flex-1 overflow-y-scroll border-4 rounded-lg shadow-3xl border-slate-400 max-h-[33rem] transition duration-500 ease-in-out ${
+            showLights && lightColor === "blue"
+              ? "border-blue-500"
+              : "border-slate-400"
+          } ${
+            showLights && lightColor === "red"
+              ? "border-red-500"
+              : "border-slate-400"
+          }`}
+        >
+          {groupPokemons().map((group, groupIndex) => (
+            <div key={groupIndex} className="flex justify-around m-2">
+              {group.map((pokemon) => (
+                <div key={pokemon.id} className="text-center">
+                  {sprites[pokemon.id] ? (
                     <Image
-                      src={"/pokeball.svg"}
-                      alt="pokeball"
+                      src={sprites[pokemon.id]}
+                      alt={pokemon.name}
                       width={64}
                       height={64}
                     />
-                    {showIds && (
-                      <p className="absolute top-0 m-0 text-xs text-center transform -translate-x-1/2 left-1/2 text-[#FDFDFD] font-bold">
-                        {pokemon.id}
-                      </p>
-                    )}
-                  </div>
-                )}
-                {/* <p>{pokemon.name}</p> */}
-              </div>
-            ))}
-          </div>
-        ))}
+                  ) : (
+                    <div className="relative flex justify-center">
+                      <Image
+                        src={"/pokeball.svg"}
+                        alt="pokeball"
+                        width={64}
+                        height={64}
+                      />
+                      {showIds && (
+                        <p className="absolute top-0 m-0 text-xs text-center transform -translate-x-1/2 left-1/2 text-[#FDFDFD] font-bold">
+                          {pokemon.id}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
