@@ -17,7 +17,7 @@ export default function PokemonQuiz({
   const [inputValue, setInputValue] = useState("");
   const [matchedCount, setMatchedCount] = useState(0);
   const [sprites, setSprites] = useState<{ [key: string]: string }>({});
-  const [itemsPerRow, setItemsPerRow] = useState(15); // 기본 가로로 보여줄 수
+  const [itemsPerRow, setItemsPerRow] = useState(20); // 기본 가로로 보여줄 수
   const [showIds, setShowIds] = useState(true); // 도감 번호 표시 여부
   const [showLights, setShowLights] = useState(true); // 색깔 불빛 표시 여부
   const [lightColor, setLightColor] = useState<string | null>(null); // 현재 색깔
@@ -37,12 +37,16 @@ export default function PokemonQuiz({
   useEffect(() => {
     const updateItemsPerRow = () => {
       const width = window.innerWidth;
-      if (width < 600) {
-        setItemsPerRow(3);
-      } else if (width < 900) {
-        setItemsPerRow(9);
-      } else {
-        setItemsPerRow(15);
+      const breakpoints = [
+        { max: 600, items: 3 },
+        { max: 900, items: 9 },
+        { max: 1500, items: 15 },
+        { max: Infinity, items: 20 },
+      ];
+
+      const currentBreakpoint = breakpoints.find((bp) => width < bp.max);
+      if (currentBreakpoint) {
+        setItemsPerRow(currentBreakpoint.items);
       }
     };
 
