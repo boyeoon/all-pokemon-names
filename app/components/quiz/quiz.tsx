@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchPokemonData, PokeAPI } from "@/pokeapi";
 import Image from "next/image";
+import Toggle from "@/components/toggle/toggle";
 
 interface PokemonQuizProps {
   numPokemonsStr: number;
@@ -108,20 +109,18 @@ export default function PokemonQuiz({
             맞추기
           </button>
         </form>
-
-        <button
-          onClick={() => setShowIds((prev) => !prev)}
-          className="p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70"
-        >
-          {showIds ? "도감 번호 숨기기" : "도감 번호 보이기"}
-        </button>
-
-        <button
-          onClick={() => setShowLights((prev) => !prev)}
-          className="p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70"
-        >
-          {showLights ? "불빛 끄기" : "불빛 켜기"}
-        </button>
+        <Toggle
+          isToggled={showIds}
+          onToggle={() => setShowIds((prev) => !prev)}
+          onText="도감 번호"
+          offText="도감 번호"
+        />
+        <Toggle
+          isToggled={showLights}
+          onToggle={() => setShowLights((prev) => !prev)}
+          onText="정답 불빛"
+          offText="정답 불빛"
+        />
       </div>
 
       <div className="flex m-8">
@@ -129,11 +128,11 @@ export default function PokemonQuiz({
           id="canvas"
           className={`flex-1 overflow-y-scroll border-4 rounded-lg shadow-3xl border-slate-400 max-h-[33rem] transition duration-500 ease-in-out ${
             showLights && lightColor === "blue"
-              ? "border-blue-500"
+              ? "border-primary"
               : "border-slate-400"
           } ${
             showLights && lightColor === "red"
-              ? "border-red-500"
+              ? "border-[#E53E3E]"
               : "border-slate-400"
           }`}
         >
