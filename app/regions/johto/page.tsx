@@ -1,6 +1,6 @@
 import PokemonQuiz from "@/components/quiz/quiz";
 
-export default function Kanto() {
+export default function Johto() {
   return (
     <div>
       <p className="m-16 text-4xl font-bold text-center">
