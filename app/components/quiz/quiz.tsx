@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { fetchPokemonData, PokeAPI } from "@/pokeapi";
 import Image from "next/image";
 import Toggle from "@/components/toggle/toggle";
@@ -57,26 +57,31 @@ export default function PokemonQuiz({
     return () => window.removeEventListener("resize", updateItemsPerRow);
   }, []);
 
-  const handleGuess = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const matchedPokemon = pokemons.find(
-      (pokemon) => pokemon.name === inputValue.trim()
-    );
+  const handleGuess = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const trimmedInput = inputValue.trim().toLowerCase(); // 입력값을 미리 처리
 
-    if (matchedPokemon) {
-      setSprites((prevSprites) => ({
-        ...prevSprites,
-        [matchedPokemon.id]: matchedPokemon.sprites.front_default,
-      }));
-      setMatchedCount((prevCount) => prevCount + 1);
-      setLightColor("blue");
-    } else {
-      setLightColor("red");
-    }
+      const matchedPokemon = pokemons.find(
+        (pokemon) => pokemon.name === trimmedInput
+      );
 
-    setInputValue("");
-    setTimeout(() => setLightColor(null), 500);
-  };
+      if (matchedPokemon) {
+        setSprites((prevSprites) => ({
+          ...prevSprites,
+          [matchedPokemon.id]: matchedPokemon.sprites.front_default,
+        }));
+        setMatchedCount((prevCount) => prevCount + 1);
+        setLightColor("blue");
+      } else {
+        setLightColor("red");
+      }
+
+      setInputValue("");
+      setTimeout(() => setLightColor(null), 500);
+    },
+    [inputValue, pokemons]
+  );
 
   const groupPokemons = useMemo(() => {
     const groups = [];
