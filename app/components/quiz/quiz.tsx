@@ -25,10 +25,11 @@ export default function PokemonQuiz({
 
   useEffect(() => {
     const loadPokemons = async () => {
-      const pokemonPromises = [];
-      for (let id = numPokemonsStr; id <= numPokemonsEnd; id++) {
-        pokemonPromises.push(fetchPokemonData(id));
-      }
+      const pokemonPromises = Array.from(
+        { length: numPokemonsEnd - numPokemonsStr + 1 },
+        (_, i) => fetchPokemonData(numPokemonsStr + i)
+      );
+
       const pokemonData = await Promise.all(pokemonPromises);
       setPokemons(pokemonData);
     };
@@ -112,14 +113,14 @@ export default function PokemonQuiz({
         <Toggle
           isToggled={showIds}
           onToggle={() => setShowIds((prev) => !prev)}
-          onText="도감 번호"
-          offText="도감 번호"
+          onText="도감 번호 켜기"
+          offText="도감 번호 끄기"
         />
         <Toggle
           isToggled={showLights}
           onToggle={() => setShowLights((prev) => !prev)}
-          onText="정답 불빛"
-          offText="정답 불빛"
+          onText="정답 불빛 켜기"
+          offText="정답 불빛 끄기"
         />
       </div>
 
