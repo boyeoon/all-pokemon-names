@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { fetchPokemonData, PokeAPI } from "@/pokeapi";
 import Image from "next/image";
 import Toggle from "@/components/toggle/toggle";
@@ -78,13 +78,13 @@ export default function PokemonQuiz({
     setTimeout(() => setLightColor(null), 500);
   };
 
-  const groupPokemons = () => {
+  const groupPokemons = useMemo(() => {
     const groups = [];
     for (let i = 0; i < pokemons.length; i += itemsPerRow) {
       groups.push(pokemons.slice(i, i + itemsPerRow));
     }
     return groups;
-  };
+  }, [pokemons, itemsPerRow]);
 
   return (
     <div>
@@ -137,7 +137,7 @@ export default function PokemonQuiz({
               : "border-slate-400"
           }`}
         >
-          {groupPokemons().map((group, groupIndex) => (
+          {groupPokemons.map((group, groupIndex) => (
             <div key={groupIndex} className="flex justify-around m-2">
               {group.map((pokemon) => (
                 <div key={pokemon.id} className="text-center">
