@@ -19,10 +19,10 @@ export const fetchPokemonData = async (id: number): Promise<PokeAPI> => {
   if (!koreanResponse.ok) {
     throw new Error("포켓몬 이름을 가져오는 데 문제가 발생했습니다.");
   }
-  const koranData = await koreanResponse.json();
+  const koreanData = await koreanResponse.json();
 
   const koreanName =
-    koranData.names?.find(
+    koreanData.names?.find(
       ({ language }: { language: { name: string } }) => language.name === "ko"
     )?.name || "이름을 찾을 수 없음";
 
