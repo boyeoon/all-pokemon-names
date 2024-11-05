@@ -4,9 +4,9 @@ import Header from "@/components/header/header";
 import Footer from "@/components/footer/footer";
 import "./globals.css";
 
-const danjunghae = localFont({
-  src: "./font/Cafe24Danjunghae-v2.0.woff2",
-  variable: "--font-danjunghae",
+const gangwon = localFont({
+  src: "./font/강원교육튼튼.woff2",
+  variable: "--font-gangwon",
   display: "swap",
 });
 
@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        className={`${danjunghae.variable} font-danjunghae`}
+        className={`${gangwon.variable} font-gangwon`}
       >
         <Header />
         <main>{children}</main>
