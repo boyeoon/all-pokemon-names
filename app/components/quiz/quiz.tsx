@@ -137,11 +137,11 @@ export default function PokemonQuiz({
           id="canvas"
           className={`flex-1 overflow-y-scroll border-4 rounded-lg shadow-3xl border-slate-400 max-h-[33rem] transition duration-500 ease-in-out ${
             showLights && lightColor === "blue"
-              ? "border-primary"
+              ? "border-blue-500"
               : "border-slate-400"
           } ${
             showLights && lightColor === "red"
-              ? "border-[#E53E3E]"
+              ? "border-red-500"
               : "border-slate-400"
           }`}
         >
