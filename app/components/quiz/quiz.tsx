@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { fetchPokemonData, PokeAPI } from "@/pokeapi";
 import Image from "next/image";
 import Toggle from "@/components/toggle/toggle";
+import Loading from "@/components/loading/loading";
 
 interface PokemonQuizProps {
   numPokemonsStr: number;
@@ -22,6 +23,7 @@ export default function PokemonQuiz({
   const [showIds, setShowIds] = useState(true); // 도감 번호 표시 여부
   const [showLights, setShowLights] = useState(true); // 색깔 불빛 표시 여부
   const [lightColor, setLightColor] = useState<string | null>(null); // 현재 색깔
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태
 
   useEffect(() => {
     const loadPokemons = async () => {
@@ -32,6 +34,7 @@ export default function PokemonQuiz({
 
       const pokemonData = await Promise.all(pokemonPromises);
       setPokemons(pokemonData);
+      setIsLoading(false);
     };
     loadPokemons();
   }, [numPokemonsStr, numPokemonsEnd]);
@@ -142,36 +145,40 @@ export default function PokemonQuiz({
               : "border-slate-400"
           }`}
         >
-          {groupPokemons.map((group, groupIndex) => (
-            <div key={groupIndex} className="flex justify-around m-2">
-              {group.map((pokemon) => (
-                <div key={pokemon.id} className="text-center">
-                  {sprites[pokemon.id] ? (
-                    <Image
-                      src={sprites[pokemon.id]}
-                      alt={pokemon.name}
-                      width={64}
-                      height={64}
-                    />
-                  ) : (
-                    <div className="relative flex justify-center">
+          {isLoading ? (
+            <Loading /> // 로딩 상태일 때 로딩 애니메이션 표시
+          ) : (
+            groupPokemons.map((group, groupIndex) => (
+              <div key={groupIndex} className="flex justify-around m-2">
+                {group.map((pokemon) => (
+                  <div key={pokemon.id} className="text-center">
+                    {sprites[pokemon.id] ? (
                       <Image
-                        src={"/pokeball.svg"}
-                        alt="pokeball"
+                        src={sprites[pokemon.id]}
+                        alt={pokemon.name}
                         width={64}
                         height={64}
                       />
-                      {showIds && (
-                        <p className="absolute top-0 m-0 text-xs text-center transform -translate-x-1/2 left-1/2 text-[#FDFDFD] font-bold">
-                          {pokemon.id}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ))}
+                    ) : (
+                      <div className="relative flex justify-center">
+                        <Image
+                          src={"/pokeball.svg"}
+                          alt="pokeball"
+                          width={64}
+                          height={64}
+                        />
+                        {showIds && (
+                          <p className="absolute top-0 m-0 text-xs text-center transform -translate-x-1/2 left-1/2 text-[#FDFDFD] font-bold">
+                            {pokemon.id}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
