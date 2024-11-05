@@ -19,7 +19,7 @@ export default function PokemonQuiz({
   const [inputValue, setInputValue] = useState("");
   const [matchedCount, setMatchedCount] = useState(0);
   const [sprites, setSprites] = useState<{ [key: string]: string }>({});
-  const [itemsPerRow, setItemsPerRow] = useState(20); // 기본 가로로 보여줄 수
+  const [itemsPerRow, setItemsPerRow] = useState(3); // 기본 가로로 보여줄 수
   const [showIds, setShowIds] = useState(true); // 도감 번호 표시 여부
   const [showLights, setShowLights] = useState(true); // 색깔 불빛 표시 여부
   const [lightColor, setLightColor] = useState<string | null>(null); // 현재 색깔
@@ -43,10 +43,10 @@ export default function PokemonQuiz({
     const updateItemsPerRow = () => {
       const width = window.innerWidth;
       const breakpoints = [
-        { max: 600, items: 3 },
-        { max: 900, items: 9 },
-        { max: 1500, items: 15 },
-        { max: Infinity, items: 20 },
+        { max: 600, items: 5 }, // 작은 화면에서는 5개씩
+        { max: 900, items: 10 }, // 중간 화면에서는 10개씩
+        { max: 1500, items: 15 }, // 큰 화면에서는 15개씩
+        { max: Infinity, items: 20 }, // 그 이상의 화면에서는 20개씩
       ];
 
       const currentBreakpoint = breakpoints.find((bp) => width < bp.max);
@@ -95,44 +95,46 @@ export default function PokemonQuiz({
   }, [pokemons, itemsPerRow]);
 
   return (
-    <div>
-      <div className="flex justify-center gap-x-8">
-        <div className="flex items-center text-lg font-bold">
+    <div className="p-4 sm:p-6 md:p-8">
+      <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-x-8">
+        <div className="text-lg font-bold">
           <p>
             현재 {matchedCount}마리 / 앞으로{" "}
             {numPokemonsEnd - numPokemonsStr + 1 - matchedCount}마리
           </p>
         </div>
-        <form onSubmit={handleGuess} className="flex justify-center gap-x-8">
+        <form onSubmit={handleGuess} className="flex w-full gap-4 sm:w-auto">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="p-2 font-bold text-black border rounded-lg outline outline-2 caret-primary"
+            className="w-full p-2 font-bold text-black border rounded-lg sm:w-48 outline outline-2 caret-primary"
             placeholder="포켓몬 이름"
           />
           <button
             type="submit"
-            className="p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70"
+            className="p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70 w-full sm:w-auto"
           >
             맞추기
           </button>
         </form>
-        <Toggle
-          isToggled={showIds}
-          onToggle={() => setShowIds((prev) => !prev)}
-          onText="도감 번호 켜기"
-          offText="도감 번호 끄기"
-        />
-        <Toggle
-          isToggled={showLights}
-          onToggle={() => setShowLights((prev) => !prev)}
-          onText="정답 불빛 켜기"
-          offText="정답 불빛 끄기"
-        />
+        <div className="flex gap-x-4">
+          <Toggle
+            isToggled={showIds}
+            onToggle={() => setShowIds((prev) => !prev)}
+            onText="도감 번호 켜기"
+            offText="도감 번호 끄기"
+          />
+          <Toggle
+            isToggled={showLights}
+            onToggle={() => setShowLights((prev) => !prev)}
+            onText="정답 불빛 켜기"
+            offText="정답 불빛 끄기"
+          />
+        </div>
       </div>
 
-      <div className="flex m-8">
+      <div className="flex justify-center mt-8">
         <div
           id="canvas"
           className={`flex-1 overflow-y-scroll border-4 rounded-lg shadow-3xl border-slate-400 max-h-[33rem] transition duration-500 ease-in-out ${

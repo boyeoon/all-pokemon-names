@@ -25,8 +25,8 @@ export default function Header() {
   ];
 
   return (
-    <nav className="flex justify-center border-b-4 border-double border-slate-400">
-      <ul className="flex m-5 space-x-12">
+    <nav className="flex justify-center p-4 border-b-4 border-double border-slate-400 sm:p-5">
+      <ul className="flex flex-wrap justify-center m-2 space-x-4 space-y-4 sm:space-x-8 sm:space-y-0">
         {links.map((link) => (
           <li key={link.href}>
             <Link
@@ -36,7 +36,6 @@ export default function Header() {
                   ? "text-primary underline decoration-4"
                   : "hover:text-primary hover:underline decoration-4"
               }`}
-              // className="text-lg font-bold hover:text-primary hover:underline decoration-4"
             >
               {link.label}
             </Link>
