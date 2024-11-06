@@ -12,6 +12,7 @@ const gangwon = localFont({
 
 export const metadata: Metadata = {
   title: "All Pokémon Names",
+  description: "각 지방의 포켓몬 이름을 맞춰보세요.",
 };
 
 export default function RootLayout({
