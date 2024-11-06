@@ -1,4 +1,5 @@
 import PokemonQuiz from "@/components/quiz/quiz";
+import { PokeNames } from "@/pokename";
 
 export default function Sinnoh() {
   return (
@@ -14,7 +15,11 @@ export default function Sinnoh() {
         </span>
         의 포켓몬을 전부 알고있나요?
       </p>
-      <PokemonQuiz numPokemonsStr={387} numPokemonsEnd={493} />
+      <PokemonQuiz
+        numPokemonsStr={387}
+        numPokemonsEnd={493}
+        regionPokemons={PokeNames.Sinnoh}
+      />
     </div>
   );
 }
