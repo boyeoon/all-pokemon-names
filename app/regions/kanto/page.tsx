@@ -1,4 +1,5 @@
 import PokemonQuiz from "@/components/quiz/quiz";
+import { PokeNames } from "@/pokename";
 
 export default function Kanto() {
   return (
@@ -14,7 +15,11 @@ export default function Kanto() {
         </span>
         의 포켓몬을 전부 알고있나요?
       </p>
-      <PokemonQuiz numPokemonsStr={1} numPokemonsEnd={151} />
+      <PokemonQuiz
+        numPokemonsStr={1}
+        numPokemonsEnd={151}
+        regionPokemons={PokeNames.Kanto}
+      />
     </div>
   );
 }
