@@ -1,4 +1,5 @@
 import PokemonQuiz from "@/components/quiz/quiz";
+import { PokeNames } from "@/pokename";
 
 export default function Alola() {
   return (
@@ -14,7 +15,11 @@ export default function Alola() {
         </span>
         의 포켓몬을 전부 알고있나요?
       </p>
-      <PokemonQuiz numPokemonsStr={722} numPokemonsEnd={809} />
+      <PokemonQuiz
+        numPokemonsStr={722}
+        numPokemonsEnd={809}
+        regionPokemons={PokeNames.Alola}
+      />
     </div>
   );
 }
