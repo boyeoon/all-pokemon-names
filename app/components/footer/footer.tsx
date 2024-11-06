@@ -17,6 +17,18 @@ export default function Footer() {
           GitHub
         </Link>
       </div>
+      <div className="text-xs">
+        <span>This project was inspired by </span>
+        <Link
+          href={"https://all-pokemon-ierukana.com/"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline decoration-4"
+        >
+          ポケモン全部言えるかな？ゲーム
+        </Link>
+        <span> and has been authorized.</span>
+      </div>
     </footer>
   );
 }
