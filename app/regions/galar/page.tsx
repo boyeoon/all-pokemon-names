@@ -1,4 +1,5 @@
 import PokemonQuiz from "@/components/quiz/quiz";
+import { PokeNames } from "@/pokename";
 
 export default function Galar() {
   return (
@@ -14,7 +15,11 @@ export default function Galar() {
         </span>
         의 포켓몬을 전부 알고있나요?
       </p>
-      <PokemonQuiz numPokemonsStr={810} numPokemonsEnd={905} />
+      <PokemonQuiz
+        numPokemonsStr={810}
+        numPokemonsEnd={905}
+        regionPokemons={PokeNames.Galar}
+      />
     </div>
   );
 }
