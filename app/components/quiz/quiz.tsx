@@ -9,21 +9,24 @@ import Loading from "@/components/loading/loading";
 interface PokemonQuizProps {
   numPokemonsStr: number;
   numPokemonsEnd: number;
+  regionPokemons: string[];
 }
 
 export default function PokemonQuiz({
   numPokemonsStr,
   numPokemonsEnd,
+  regionPokemons, // 지역 포켓몬 목록
 }: PokemonQuizProps) {
   const [pokemons, setPokemons] = useState<PokeAPI[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [matchedCount, setMatchedCount] = useState(0);
   const [sprites, setSprites] = useState<{ [key: string]: string }>({});
-  const [itemsPerRow, setItemsPerRow] = useState(3); // 기본 가로로 보여줄 수
-  const [showIds, setShowIds] = useState(true); // 도감 번호 표시 여부
-  const [showLights, setShowLights] = useState(true); // 색깔 불빛 표시 여부
-  const [lightColor, setLightColor] = useState<string | null>(null); // 현재 색깔
-  const [isLoading, setIsLoading] = useState(true); // 로딩 상태
+  const [itemsPerRow, setItemsPerRow] = useState(3);
+  const [showIds, setShowIds] = useState(true);
+  const [showLights, setShowLights] = useState(true);
+  const [lightColor, setLightColor] = useState<string | null>(null); // 정답 불빛 색상 관리
+  const [isLoading, setIsLoading] = useState(true);
+  const [borderColor, setBorderColor] = useState<string>("slate");
 
   useEffect(() => {
     const loadPokemons = async () => {
@@ -43,10 +46,10 @@ export default function PokemonQuiz({
     const updateItemsPerRow = () => {
       const width = window.innerWidth;
       const breakpoints = [
-        { max: 600, items: 5 }, // 작은 화면에서는 5개씩
-        { max: 900, items: 10 }, // 중간 화면에서는 10개씩
-        { max: 1500, items: 15 }, // 큰 화면에서는 15개씩
-        { max: Infinity, items: 20 }, // 그 이상의 화면에서는 20개씩
+        { max: 600, items: 5 },
+        { max: 900, items: 10 },
+        { max: 1500, items: 15 },
+        { max: Infinity, items: 20 },
       ];
 
       const currentBreakpoint = breakpoints.find((bp) => width < bp.max);
@@ -63,8 +66,23 @@ export default function PokemonQuiz({
   const handleGuess = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      const trimmedInput = inputValue.trim().toLowerCase(); // 입력값을 미리 처리
+      const trimmedInput = inputValue.trim().toLowerCase();
 
+      // 지역 포켓몬 목록에서 맞는 포켓몬이 있는지 확인
+      const isMatched = regionPokemons
+        .map((name) => name.toLowerCase())
+        .includes(trimmedInput);
+
+      if (isMatched) {
+        setBorderColor("blue"); // 맞으면 파란색
+        setLightColor("blue"); // 맞으면 파란색
+        setMatchedCount((prevCount) => prevCount + 1);
+      } else {
+        setBorderColor("red"); // 틀리면 빨간색
+        setLightColor("red"); // 틀리면 빨간색
+      }
+
+      // 포켓몬 데이터에서 이름이 일치하는 포켓몬을 찾기
       const matchedPokemon = pokemons.find(
         (pokemon) => pokemon.name === trimmedInput
       );
@@ -74,16 +92,15 @@ export default function PokemonQuiz({
           ...prevSprites,
           [matchedPokemon.id]: matchedPokemon.sprites.front_default,
         }));
-        setMatchedCount((prevCount) => prevCount + 1);
-        setLightColor("blue");
-      } else {
-        setLightColor("red");
       }
 
       setInputValue("");
-      setTimeout(() => setLightColor(null), 500);
+      setTimeout(() => {
+        setLightColor(null); // 0.5초 후에 불빛을 끄고 원래 색으로 복원
+        setBorderColor("slate"); // 원래 테두리 색상으로 복원
+      }, 500); // 0.5초 후에 원래 상태로 복원
     },
-    [inputValue, pokemons]
+    [inputValue, pokemons, regionPokemons]
   );
 
   const groupPokemons = useMemo(() => {
@@ -137,18 +154,16 @@ export default function PokemonQuiz({
       <div className="flex justify-center mt-8">
         <div
           id="canvas"
-          className={`flex-1 overflow-y-scroll border-4 rounded-lg shadow-3xl border-slate-400 max-h-[33rem] transition duration-500 ease-in-out ${
+          className={`flex-1 overflow-y-scroll border-4 rounded-lg shadow-3xl max-h-[33rem] transition duration-500 ease-in-out ${
             showLights && lightColor === "blue"
               ? "border-blue-500"
-              : "border-slate-400"
-          } ${
-            showLights && lightColor === "red"
+              : showLights && lightColor === "red"
               ? "border-red-500"
               : "border-slate-400"
           }`}
         >
           {isLoading ? (
-            <Loading /> // 로딩 상태일 때 로딩 애니메이션 표시
+            <Loading />
           ) : (
             groupPokemons.map((group, groupIndex) => (
               <div key={groupIndex} className="flex justify-around m-2">
