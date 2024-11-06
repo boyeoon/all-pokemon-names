@@ -1,4 +1,5 @@
 import PokemonQuiz from "@/components/quiz/quiz";
+import { PokeNames } from "@/pokename";
 
 export default function Johto() {
   return (
@@ -14,7 +15,11 @@ export default function Johto() {
         </span>
         의 포켓몬을 전부 알고있나요?
       </p>
-      <PokemonQuiz numPokemonsStr={152} numPokemonsEnd={251} />
+      <PokemonQuiz
+        numPokemonsStr={152}
+        numPokemonsEnd={251}
+        regionPokemons={PokeNames.Johto}
+      />
     </div>
   );
 }
