@@ -21,7 +21,7 @@ export default function Header() {
     { href: "/regions/alola", label: "알로라" },
     { href: "/regions/galar", label: "가라르" },
     { href: "/regions/paldea", label: "팔데아" },
-    { href: "/", label: "모든 지방" },
+    { href: "/regions/all", label: "모든 지방" },
   ];
 
   return (
