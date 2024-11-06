@@ -1,4 +1,5 @@
 import PokemonQuiz from "@/components/quiz/quiz";
+import { PokeNames } from "@/pokename";
 
 export default function Unova() {
   return (
@@ -14,7 +15,11 @@ export default function Unova() {
         </span>
         의 포켓몬을 전부 알고있나요?
       </p>
-      <PokemonQuiz numPokemonsStr={494} numPokemonsEnd={649} />
+      <PokemonQuiz
+        numPokemonsStr={494}
+        numPokemonsEnd={649}
+        regionPokemons={PokeNames.Unova}
+      />
     </div>
   );
 }
