@@ -26,7 +26,6 @@ export default function PokemonQuiz({
   const [showLights, setShowLights] = useState(true);
   const [lightColor, setLightColor] = useState<string | null>(null); // 정답 불빛 색상 관리
   const [isLoading, setIsLoading] = useState(true);
-  const [borderColor, setBorderColor] = useState<string>("slate");
 
   useEffect(() => {
     const loadPokemons = async () => {
@@ -74,12 +73,10 @@ export default function PokemonQuiz({
         .includes(trimmedInput);
 
       if (isMatched) {
-        setBorderColor("blue"); // 맞으면 파란색
-        setLightColor("blue"); // 맞으면 파란색
+        setLightColor("blue"); // 맞으면 불빛 파란색
         setMatchedCount((prevCount) => prevCount + 1);
       } else {
-        setBorderColor("red"); // 틀리면 빨간색
-        setLightColor("red"); // 틀리면 빨간색
+        setLightColor("red"); // 틀리면 불빛 빨간색
       }
 
       // 포켓몬 데이터에서 이름이 일치하는 포켓몬을 찾기
@@ -97,7 +94,6 @@ export default function PokemonQuiz({
       setInputValue("");
       setTimeout(() => {
         setLightColor(null); // 0.5초 후에 불빛을 끄고 원래 색으로 복원
-        setBorderColor("slate"); // 원래 테두리 색상으로 복원
       }, 500); // 0.5초 후에 원래 상태로 복원
     },
     [inputValue, pokemons, regionPokemons]
