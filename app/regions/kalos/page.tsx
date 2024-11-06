@@ -1,4 +1,5 @@
 import PokemonQuiz from "@/components/quiz/quiz";
+import { PokeNames } from "@/pokename";
 
 export default function Kalos() {
   return (
@@ -14,7 +15,11 @@ export default function Kalos() {
         </span>
         의 포켓몬을 전부 알고있나요?
       </p>
-      <PokemonQuiz numPokemonsStr={650} numPokemonsEnd={721} />
+      <PokemonQuiz
+        numPokemonsStr={650}
+        numPokemonsEnd={721}
+        regionPokemons={PokeNames.Kalos}
+      />
     </div>
   );
 }
