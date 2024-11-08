@@ -4,9 +4,9 @@ import Header from "@/components/header/header";
 import Footer from "@/components/footer/footer";
 import "./globals.css";
 
-const gangwon = localFont({
-  src: "./font/강원교육튼튼.woff2",
-  variable: "--font-gangwon",
+const SCDream = localFont({
+  src: "./font/SCDream5.woff2",
+  variable: "--font-SCDream",
   display: "swap",
 });
 
@@ -24,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        className={`${gangwon.variable} font-gangwon`}
+        className={`${SCDream.variable} font-SCDream`}
       >
         <Header />
         <main>{children}</main>

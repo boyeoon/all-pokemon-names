@@ -18,7 +18,7 @@ const config: Config = {
         "3xl": "0 35px 60px -15px rgba(0, 0, 0, 0.3)",
       },
       fontFamily: {
-        gangwon: ["var(--font-gangwon)"],
+        SCDream: ["var(--font-SCDream)"],
       },
     },
   },
