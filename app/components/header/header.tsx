@@ -25,13 +25,13 @@ export default function Header() {
   ];
 
   return (
-    <nav className="flex justify-center p-4 border-b-4 border-double border-slate-400 sm:p-5">
-      <ul className="flex flex-wrap justify-center m-2 space-x-4 space-y-4 sm:space-x-8 sm:space-y-0">
+    <nav className="flex justify-center p-2 border-b-4 border-double md:p-4 border-slate-400">
+      <ul className="flex flex-wrap items-start justify-center m-2 space-x-4 sm:space-x-8">
         {links.map((link) => (
-          <li key={link.href}>
+          <li key={link.href} className="m-1">
             <Link
               href={link.href}
-              className={`text-lg font-bold ${
+              className={`text-base lg:text-lg font-bold ${
                 pathname === link.href
                   ? "text-primary underline decoration-4"
                   : "hover:text-primary hover:underline decoration-4"
