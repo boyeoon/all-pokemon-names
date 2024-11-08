@@ -110,10 +110,13 @@ export default function PokemonQuiz({
   return (
     <div className="p-4 sm:p-6 md:p-8">
       <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-x-8">
-        <div className="text-lg font-bold">
+        <div className="font-bold md:text-base lg:text-lg">
           <p>
-            현재 {matchedCount}마리 / 앞으로{" "}
-            {numPokemonsEnd - numPokemonsStr + 1 - matchedCount}마리
+            <span>현재 {matchedCount}마리</span>
+            <span> / </span>
+            <span>
+              앞으로 {numPokemonsEnd - numPokemonsStr + 1 - matchedCount}마리
+            </span>
           </p>
         </div>
         <form onSubmit={handleGuess} className="flex w-full gap-4 sm:w-auto">
@@ -121,12 +124,12 @@ export default function PokemonQuiz({
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="w-full p-2 font-bold text-black border rounded-lg sm:w-48 outline outline-2 caret-primary"
+            className="w-full h-12 p-2 font-bold text-black border rounded-lg md:w-28 lg:w-48 outline outline-2 caret-primary"
             placeholder="포켓몬 이름"
           />
           <button
             type="submit"
-            className="p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70 w-full sm:w-auto"
+            className="w-full p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70 lg:w-16 h-12 sm:w-auto"
           >
             맞추기
           </button>
@@ -135,14 +138,14 @@ export default function PokemonQuiz({
           <Toggle
             isToggled={showIds}
             onToggle={() => setShowIds((prev) => !prev)}
-            onText="도감 번호 켜기"
-            offText="도감 번호 끄기"
+            onText="도감 번호"
+            offText="도감 번호"
           />
           <Toggle
             isToggled={showLights}
             onToggle={() => setShowLights((prev) => !prev)}
-            onText="정답 불빛 켜기"
-            offText="정답 불빛 끄기"
+            onText="정답 불빛"
+            offText="정답 불빛"
           />
         </div>
       </div>
