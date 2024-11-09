@@ -108,7 +108,7 @@ export default function PokemonQuiz({
   }, [pokemons, itemsPerRow]);
 
   return (
-    <div className="p-4 sm:p-6 md:p-8">
+    <div className="p-4 md:p-8 lg:px-20">
       <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-x-8">
         <div className="font-bold md:text-base lg:text-lg">
           <p>
