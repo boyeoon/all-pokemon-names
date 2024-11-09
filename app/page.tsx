@@ -26,7 +26,7 @@ export default function Home() {
             <div key={link.href} className="text-center">
               <Link
                 href={link.href}
-                className="block p-8 m-2 text-lg border rounded-lg border-slate-500 hover:border-slate-200 shadow-3xl"
+                className="block p-8 m-2 text-lg border rounded-lg border-slate-500 hover:border-slate-200 shadow-4xl"
               >
                 {link.label}
               </Link>

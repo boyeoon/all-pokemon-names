@@ -153,7 +153,7 @@ export default function PokemonQuiz({
       <div className="flex justify-center mt-8">
         <div
           id="canvas"
-          className={`flex-1 overflow-y-scroll border-4 rounded-lg shadow-3xl max-h-[33rem] transition duration-500 ease-in-out ${
+          className={`flex-1 overflow-y-scroll border-4 rounded-lg shadow-4xl max-h-[33rem] transition duration-500 ease-in-out ${
             showLights && lightColor === "blue"
               ? "border-blue-500"
               : showLights && lightColor === "red"

@@ -16,6 +16,7 @@ const config: Config = {
       },
       boxShadow: {
         "3xl": "0 35px 60px -15px rgba(0, 0, 0, 0.3)",
+        "4xl": "0 35px 75px -20px rgba(0, 0, 0, 0.7)",
       },
       fontFamily: {
         SCDream: ["var(--font-SCDream)"],
