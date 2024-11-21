@@ -4,7 +4,9 @@
 
 This website is currently hosted at [**all-pokemon-names**](https://all-pokemon-names.vercel.app/).
 
-Do you know all the Pokémon from the Kanto region (1st generation), Johto region (2nd generation), Hoenn region (3rd generation), and beyond? This interactive quiz application allows you to test your knowledge of Pokémon. Your goal is to guess the names of the Pokémon based on their Pokédex numbers. For users who want to enjoy hard mode, there is a feature to display or hide the Pokédex numbers.
+Do you know all the Pokémon from the Kanto region (1st generation), Johto region (2nd generation), Hoenn region (3rd generation), and beyond?
+
+This interactive quiz application allows you to test your knowledge of Pokémon. Your goal is to guess the names of the Pokémon based on their Pokédex numbers. For users who want to enjoy hard mode, there is a feature to display or hide the Pokédex numbers.
 
 |                           |                                  |                                    |
 | ------------------------- | -------------------------------- | ---------------------------------- |
