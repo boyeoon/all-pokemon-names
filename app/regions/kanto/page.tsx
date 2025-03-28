@@ -1,4 +1,4 @@
-import PokemonQuiz from "@/components/quiz/quiz";
+import PokemonQuiz from "@/components/quiz/pokemonquiz";
 import { PokeNames } from "@/pokename";
 
 export default function Kanto() {

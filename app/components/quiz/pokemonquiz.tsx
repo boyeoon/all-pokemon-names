@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { fetchPokemonData, PokeAPI } from "@/pokeapi";
 import Image from "next/image";
 import Toggle from "@/components/toggle/toggle";
@@ -26,6 +26,13 @@ export default function PokemonQuiz({
   const [showLights, setShowLights] = useState(true);
   const [lightColor, setLightColor] = useState<string | null>(null); // 정답 불빛 색상 관리
   const [isLoading, setIsLoading] = useState(true);
+  const lightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Set으로 만들어 빠른 탐색 가능
+  const regionPokemonSet = useMemo(
+    () => new Set(regionPokemons.map((name) => name.toLowerCase())),
+    [regionPokemons]
+  );
 
   useEffect(() => {
     const loadPokemons = async () => {
@@ -51,10 +58,8 @@ export default function PokemonQuiz({
         { max: Infinity, items: 20 },
       ];
 
-      const currentBreakpoint = breakpoints.find((bp) => width < bp.max);
-      if (currentBreakpoint) {
-        setItemsPerRow(currentBreakpoint.items);
-      }
+      const current = breakpoints.find((bp) => width < bp.max);
+      if (current) setItemsPerRow(current.items);
     };
 
     updateItemsPerRow();
@@ -67,36 +72,32 @@ export default function PokemonQuiz({
       e.preventDefault();
       const trimmedInput = inputValue.trim().toLowerCase();
 
-      // 지역 포켓몬 목록에서 맞는 포켓몬이 있는지 확인
-      const isMatched = regionPokemons
-        .map((name) => name.toLowerCase())
-        .includes(trimmedInput);
+      if (!trimmedInput) return;
+
+      const isMatched = regionPokemonSet.has(trimmedInput);
+      setLightColor(isMatched ? "blue" : "red");
 
       if (isMatched) {
-        setLightColor("blue"); // 맞으면 불빛 파란색
-        setMatchedCount((prevCount) => prevCount + 1);
-      } else {
-        setLightColor("red"); // 틀리면 불빛 빨간색
+        setMatchedCount((prev) => prev + 1);
       }
 
-      // 포켓몬 데이터에서 이름이 일치하는 포켓몬을 찾기
       const matchedPokemon = pokemons.find(
         (pokemon) => pokemon.name === trimmedInput
       );
 
       if (matchedPokemon) {
-        setSprites((prevSprites) => ({
-          ...prevSprites,
+        setSprites((prev) => ({
+          ...prev,
           [matchedPokemon.id]: matchedPokemon.sprites.front_default,
         }));
       }
 
       setInputValue("");
-      setTimeout(() => {
-        setLightColor(null); // 0.5초 후에 불빛을 끄고 원래 색으로 복원
-      }, 500); // 0.5초 후에 원래 상태로 복원
+
+      if (lightTimeoutRef.current) clearTimeout(lightTimeoutRef.current);
+      lightTimeoutRef.current = setTimeout(() => setLightColor(null), 500);
     },
-    [inputValue, pokemons, regionPokemons]
+    [inputValue, pokemons, regionPokemonSet]
   );
 
   const groupPokemons = useMemo(() => {
@@ -178,7 +179,7 @@ export default function PokemonQuiz({
                     ) : (
                       <div className="relative flex justify-center">
                         <Image
-                          src={"/pokeball.svg"}
+                          src="/pokeball.svg"
                           alt="pokeball"
                           width={64}
                           height={64}
