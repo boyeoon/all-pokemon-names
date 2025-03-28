@@ -5,6 +5,7 @@ import { fetchPokemonData, PokeAPI } from "@/pokeapi";
 import Image from "next/image";
 import Toggle from "@/components/toggle/toggle";
 import Loading from "@/components/loading/loading";
+import Pokeball from "@/components/ball/pokeball";
 
 interface PokemonQuizProps {
   numPokemonsStr: number;
@@ -36,15 +37,27 @@ export default function PokemonQuiz({
 
   useEffect(() => {
     const loadPokemons = async () => {
-      const pokemonPromises = Array.from(
+      setIsLoading(true);
+      const ids = Array.from(
         { length: numPokemonsEnd - numPokemonsStr + 1 },
-        (_, i) => fetchPokemonData(numPokemonsStr + i)
+        (_, i) => numPokemonsStr + i
       );
 
-      const pokemonData = await Promise.all(pokemonPromises);
-      setPokemons(pokemonData);
+      const pokemonPromises = ids.map(async (id) => {
+        try {
+          return await fetchPokemonData(id);
+        } catch (e) {
+          console.warn(`포켓몬 #${id} 불러오기 실패`, e);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(pokemonPromises);
+      const filtered = results.filter((p): p is PokeAPI => p !== null);
+      setPokemons(filtered);
       setIsLoading(false);
     };
+
     loadPokemons();
   }, [numPokemonsStr, numPokemonsEnd]);
 
@@ -177,19 +190,7 @@ export default function PokemonQuiz({
                         height={64}
                       />
                     ) : (
-                      <div className="relative flex justify-center">
-                        <Image
-                          src="/pokeball.svg"
-                          alt="pokeball"
-                          width={64}
-                          height={64}
-                        />
-                        {showIds && (
-                          <p className="absolute top-0 m-0 text-xs text-center transform -translate-x-1/2 left-1/2 text-[#FDFDFD] font-bold">
-                            {pokemon.id}
-                          </p>
-                        )}
-                      </div>
+                      <Pokeball id={pokemon.id} showId={showIds} />
                     )}
                   </div>
                 ))}
