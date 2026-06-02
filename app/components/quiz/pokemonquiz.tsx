@@ -50,7 +50,12 @@ export default function PokemonQuiz({
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
+  const [focusedPokemonTarget, setFocusedPokemonTarget] = useState<{
+    id: number;
+    requestId: number;
+  } | null>(null);
   const lightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pokemonElementRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const pokemons = useMemo<Pokemon[]>(() => {
     const totalPokemons = numPokemonsEnd - numPokemonsStr + 1;
@@ -78,6 +83,7 @@ export default function PokemonQuiz({
     setElapsedSeconds(0);
     setIsTimerRunning(false);
     setQuizResult(null);
+    setFocusedPokemonTarget(null);
   }, [pokemons]);
 
   useEffect(() => {
@@ -114,6 +120,19 @@ export default function PokemonQuiz({
       if (lightTimeoutRef.current) clearTimeout(lightTimeoutRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!focusedPokemonTarget || quizResult) return;
+
+    const pokemonElement = pokemonElementRefs.current[focusedPokemonTarget.id];
+    if (!pokemonElement) return;
+
+    pokemonElement.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "center",
+    });
+  }, [focusedPokemonTarget, matchedPokemonIds, quizResult]);
 
   const buildQuizResult = useCallback(
     (type: ResultType, matchedIds: Set<number>, seconds: number) => {
@@ -176,6 +195,11 @@ export default function PokemonQuiz({
       setLightColor(matchedPokemons.length > 0 ? "blue" : "red");
 
       if (matchedPokemons.length > 0) {
+        setFocusedPokemonTarget((prev) => ({
+          id: matchedPokemons[0].id,
+          requestId: (prev?.requestId ?? 0) + 1,
+        }));
+
         setMatchedPokemonIds((prev) => {
           const newPokemonIds = matchedPokemons.filter(
             (pokemon) => !prev.has(pokemon.id),
@@ -231,6 +255,7 @@ export default function PokemonQuiz({
     setIsTimerRunning(false);
     setQuizResult(null);
     setLightColor(null);
+    setFocusedPokemonTarget(null);
   };
 
   return (
@@ -320,7 +345,17 @@ export default function PokemonQuiz({
           {groupPokemons.map((group, groupIndex) => (
             <div key={groupIndex} className="flex justify-around m-2">
               {group.map((pokemon) => (
-                <div key={pokemon.id} className="text-center">
+                <div
+                  key={pokemon.id}
+                  ref={(element) => {
+                    pokemonElementRefs.current[pokemon.id] = element;
+                  }}
+                  className={`rounded-lg text-center transition ${
+                    focusedPokemonTarget?.id === pokemon.id
+                      ? "ring-4 ring-primary/80"
+                      : ""
+                  }`}
+                >
                   {matchedPokemonIds.has(pokemon.id) ? (
                     <Image
                       src={pokemon.sprite}
