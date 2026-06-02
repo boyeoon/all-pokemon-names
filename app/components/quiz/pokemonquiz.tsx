@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import Image from "next/image";
-import Toggle from "@/components/toggle/toggle";
 import Pokeball from "@/components/ball/pokeball";
 
 interface PokemonQuizProps {
@@ -17,6 +16,8 @@ interface Pokemon {
   sprite: string;
 }
 
+type QuizMode = "easy" | "hard";
+
 export default function PokemonQuiz({
   numPokemonsStr,
   numPokemonsEnd,
@@ -27,8 +28,7 @@ export default function PokemonQuiz({
     () => new Set()
   );
   const [itemsPerRow, setItemsPerRow] = useState(3);
-  const [showIds, setShowIds] = useState(true);
-  const [showLights, setShowLights] = useState(true);
+  const [quizMode, setQuizMode] = useState<QuizMode>("easy");
   const [lightColor, setLightColor] = useState<"blue" | "red" | null>(null);
   const lightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -91,15 +91,27 @@ export default function PokemonQuiz({
 
       if (!trimmedInput) return;
 
-      const matchedPokemon = pokemonByName.get(trimmedInput);
-      setLightColor(matchedPokemon ? "blue" : "red");
+      const matchedPokemons =
+        trimmedInput === "니드런"
+          ? pokemons.filter(
+              (pokemon) => pokemon.name === "니드런♀" || pokemon.name === "니드런♂"
+            )
+          : [pokemonByName.get(trimmedInput)].filter(
+              (pokemon): pokemon is Pokemon => pokemon !== undefined
+            );
 
-      if (matchedPokemon) {
+      setLightColor(matchedPokemons.length > 0 ? "blue" : "red");
+
+      if (matchedPokemons.length > 0) {
         setMatchedPokemonIds((prev) => {
-          if (prev.has(matchedPokemon.id)) return prev;
+          const newPokemonIds = matchedPokemons.filter(
+            (pokemon) => !prev.has(pokemon.id)
+          );
+
+          if (newPokemonIds.length === 0) return prev;
 
           const next = new Set(prev);
-          next.add(matchedPokemon.id);
+          newPokemonIds.forEach((pokemon) => next.add(pokemon.id));
           return next;
         });
       }
@@ -109,7 +121,12 @@ export default function PokemonQuiz({
       if (lightTimeoutRef.current) clearTimeout(lightTimeoutRef.current);
       lightTimeoutRef.current = setTimeout(() => setLightColor(null), 500);
     },
-    [inputValue, pokemonByName]
+    [inputValue, pokemonByName, pokemons]
+  );
+
+  const unmatchedPokemons = useMemo(
+    () => pokemons.filter((pokemon) => !matchedPokemonIds.has(pokemon.id)),
+    [matchedPokemonIds, pokemons]
   );
 
   const groupPokemons = useMemo(() => {
@@ -121,11 +138,12 @@ export default function PokemonQuiz({
   }, [pokemons, itemsPerRow]);
 
   const matchedCount = matchedPokemonIds.size;
-  const remainingCount = pokemons.length - matchedCount;
+  const remainingCount = unmatchedPokemons.length;
+  const isEasyMode = quizMode === "easy";
 
   return (
     <div className="p-4 md:p-8 lg:px-20">
-      <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-x-8">
+      <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-8">
         <div className="font-bold md:text-base lg:text-lg">
           <p>
             <span>현재 {matchedCount}마리</span>
@@ -148,19 +166,38 @@ export default function PokemonQuiz({
             맞추기
           </button>
         </form>
-        <div className="flex gap-x-4">
-          <Toggle
-            isToggled={showIds}
-            onToggle={() => setShowIds((prev) => !prev)}
-            onText="도감 번호"
-            offText="도감 번호"
-          />
-          <Toggle
-            isToggled={showLights}
-            onToggle={() => setShowLights((prev) => !prev)}
-            onText="정답 불빛"
-            offText="정답 불빛"
-          />
+        <div className="flex h-12 rounded-lg border border-slate-500 bg-slate-900/60 p-1">
+          <div className="group relative">
+            <button
+              type="button"
+              onClick={(event) => {
+                setQuizMode("easy");
+                event.currentTarget.blur();
+              }}
+              className={`h-full px-4 font-bold rounded-md transition ${
+                isEasyMode
+                  ? "bg-primary text-[#FDFDFD]"
+                  : "text-slate-300 hover:text-[#FDFDFD]"
+              }`}
+            >
+              쉬움
+            </button>
+            <div className="pointer-events-none absolute left-1/2 top-12 z-10 hidden w-64 -translate-x-1/2 rounded-lg border border-slate-300/30 bg-slate-950/80 p-4 text-center text-sm font-bold text-[#FDFDFD] shadow-4xl backdrop-blur group-hover:block">
+              <p>도감 번호를 알려줘요.</p>
+              <p className="mt-2">정답 불빛을 알려줘요.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setQuizMode("hard")}
+            className={`px-4 font-bold rounded-md transition ${
+              !isEasyMode
+                ? "bg-primary text-[#FDFDFD]"
+                : "text-slate-300 hover:text-[#FDFDFD]"
+            }`}
+          >
+            어려움
+          </button>
         </div>
       </div>
 
@@ -168,9 +205,9 @@ export default function PokemonQuiz({
         <div
           id="canvas"
           className={`flex-1 overflow-y-scroll border-4 rounded-lg shadow-4xl max-h-[33rem] transition duration-500 ease-in-out ${
-            showLights && lightColor === "blue"
+            isEasyMode && lightColor === "blue"
               ? "border-blue-500"
-              : showLights && lightColor === "red"
+              : isEasyMode && lightColor === "red"
               ? "border-red-500"
               : "border-slate-400"
           }`}
@@ -187,7 +224,7 @@ export default function PokemonQuiz({
                       height={64}
                     />
                   ) : (
-                    <Pokeball id={pokemon.id} showId={showIds} />
+                    <Pokeball id={pokemon.id} showId={isEasyMode} />
                   )}
                 </div>
               ))}
