@@ -2,7 +2,7 @@
 
 ![kanto-region](https://i.imgur.com/GaJMmXl.png)
 
-このウェブサイトは現在、[**all-pokemon-names**](https://all-pokemon-names.vercel.app/)でホストされています。
+このウェブサイトは現在、[**all-pokemon-names**](https://allpokemonnames.vercel.app/)でホストされています。
 
 あなたはカントー地方（第 1 世代）、ジョウト地方（第 2 世代）、ホウエン地方（第 3 世代）などのすべてのポケモンを知っていますか？
 

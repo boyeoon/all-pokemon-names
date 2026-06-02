@@ -2,7 +2,7 @@
 
 ![kanto-region](https://i.imgur.com/GaJMmXl.png)
 
-이 웹사이트는 현재 [**all-pokemon-names**](https://all-pokemon-names.vercel.app/)에서 호스팅되고 있습니다.
+이 웹사이트는 현재 [**all-pokemon-names**](https://allpokemonnames.vercel.app/)에서 호스팅되고 있습니다.
 
 관동 지방(1세대), 성도 지방(2세대), 호연 지방(3세대) 등 모든 지방의 포켓몬을 전부 알고 있나요?
 
