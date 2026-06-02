@@ -17,6 +17,23 @@ interface Pokemon {
 }
 
 type QuizMode = "easy" | "hard";
+type ResultType = "completed" | "ended";
+
+interface QuizResult {
+  type: ResultType;
+  elapsedSeconds: number;
+  matchedCount: number;
+  missedPokemons: Pokemon[];
+}
+
+const formatElapsedTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${String(minutes).padStart(2, "0")}:${String(
+    remainingSeconds,
+  ).padStart(2, "0")}`;
+};
 
 export default function PokemonQuiz({
   numPokemonsStr,
@@ -25,11 +42,14 @@ export default function PokemonQuiz({
 }: PokemonQuizProps) {
   const [inputValue, setInputValue] = useState("");
   const [matchedPokemonIds, setMatchedPokemonIds] = useState<Set<number>>(
-    () => new Set()
+    () => new Set(),
   );
   const [itemsPerRow, setItemsPerRow] = useState(3);
   const [quizMode, setQuizMode] = useState<QuizMode>("easy");
   const [lightColor, setLightColor] = useState<"blue" | "red" | null>(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const lightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pokemons = useMemo<Pokemon[]>(() => {
@@ -48,16 +68,27 @@ export default function PokemonQuiz({
 
   const pokemonByName = useMemo(
     () =>
-      new Map(
-        pokemons.map((pokemon) => [pokemon.name.toLowerCase(), pokemon])
-      ),
-    [pokemons]
+      new Map(pokemons.map((pokemon) => [pokemon.name.toLowerCase(), pokemon])),
+    [pokemons],
   );
 
   useEffect(() => {
     setMatchedPokemonIds(new Set());
     setInputValue("");
+    setElapsedSeconds(0);
+    setIsTimerRunning(false);
+    setQuizResult(null);
   }, [pokemons]);
+
+  useEffect(() => {
+    if (!isTimerRunning) return;
+
+    const timerId = setInterval(() => {
+      setElapsedSeconds((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [isTimerRunning]);
 
   useEffect(() => {
     const updateItemsPerRow = () => {
@@ -84,20 +115,62 @@ export default function PokemonQuiz({
     };
   }, []);
 
+  const buildQuizResult = useCallback(
+    (type: ResultType, matchedIds: Set<number>, seconds: number) => {
+      const missedPokemons = pokemons.filter(
+        (pokemon) => !matchedIds.has(pokemon.id),
+      );
+
+      return {
+        type,
+        elapsedSeconds: seconds,
+        matchedCount: matchedIds.size,
+        missedPokemons,
+      };
+    },
+    [pokemons],
+  );
+
+  const finishQuiz = useCallback(
+    (type: ResultType, matchedIds = matchedPokemonIds) => {
+      setIsTimerRunning(false);
+      setQuizResult(buildQuizResult(type, matchedIds, elapsedSeconds));
+    },
+    [buildQuizResult, elapsedSeconds, matchedPokemonIds],
+  );
+
+  useEffect(() => {
+    if (
+      pokemons.length > 0 &&
+      matchedPokemonIds.size === pokemons.length &&
+      isTimerRunning &&
+      !quizResult
+    ) {
+      finishQuiz("completed", matchedPokemonIds);
+    }
+  }, [
+    finishQuiz,
+    isTimerRunning,
+    matchedPokemonIds,
+    pokemons.length,
+    quizResult,
+  ]);
+
   const handleGuess = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const trimmedInput = inputValue.trim().toLowerCase();
 
-      if (!trimmedInput) return;
+      if (!trimmedInput || quizResult) return;
 
       const matchedPokemons =
         trimmedInput === "니드런"
           ? pokemons.filter(
-              (pokemon) => pokemon.name === "니드런♀" || pokemon.name === "니드런♂"
+              (pokemon) =>
+                pokemon.name === "니드런♀" || pokemon.name === "니드런♂",
             )
           : [pokemonByName.get(trimmedInput)].filter(
-              (pokemon): pokemon is Pokemon => pokemon !== undefined
+              (pokemon): pokemon is Pokemon => pokemon !== undefined,
             );
 
       setLightColor(matchedPokemons.length > 0 ? "blue" : "red");
@@ -105,7 +178,7 @@ export default function PokemonQuiz({
       if (matchedPokemons.length > 0) {
         setMatchedPokemonIds((prev) => {
           const newPokemonIds = matchedPokemons.filter(
-            (pokemon) => !prev.has(pokemon.id)
+            (pokemon) => !prev.has(pokemon.id),
           );
 
           if (newPokemonIds.length === 0) return prev;
@@ -121,12 +194,12 @@ export default function PokemonQuiz({
       if (lightTimeoutRef.current) clearTimeout(lightTimeoutRef.current);
       lightTimeoutRef.current = setTimeout(() => setLightColor(null), 500);
     },
-    [inputValue, pokemonByName, pokemons]
+    [inputValue, pokemonByName, pokemons, quizResult],
   );
 
   const unmatchedPokemons = useMemo(
     () => pokemons.filter((pokemon) => !matchedPokemonIds.has(pokemon.id)),
-    [matchedPokemonIds, pokemons]
+    [matchedPokemonIds, pokemons],
   );
 
   const groupPokemons = useMemo(() => {
@@ -140,6 +213,25 @@ export default function PokemonQuiz({
   const matchedCount = matchedPokemonIds.size;
   const remainingCount = unmatchedPokemons.length;
   const isEasyMode = quizMode === "easy";
+  const resultMissedCount = quizResult?.missedPokemons.length ?? 0;
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+
+    if (value.trim() && !isTimerRunning && !quizResult) {
+      setIsTimerRunning(true);
+    }
+  };
+
+  const handleResetQuiz = () => {
+    if (lightTimeoutRef.current) clearTimeout(lightTimeoutRef.current);
+    setMatchedPokemonIds(new Set());
+    setInputValue("");
+    setElapsedSeconds(0);
+    setIsTimerRunning(false);
+    setQuizResult(null);
+    setLightColor(null);
+  };
 
   return (
     <div className="p-4 md:p-8 lg:px-20">
@@ -151,21 +243,34 @@ export default function PokemonQuiz({
             <span>앞으로 {remainingCount}마리</span>
           </p>
         </div>
+        <div className="font-bold text-primary md:text-base lg:text-lg">
+          {formatElapsedTime(elapsedSeconds)}
+        </div>
         <form onSubmit={handleGuess} className="flex w-full gap-4 sm:w-auto">
           <input
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => handleInputChange(e.target.value)}
+            disabled={Boolean(quizResult)}
             className="w-full h-12 p-2 font-bold text-black border rounded-lg md:w-28 lg:w-48 outline outline-2 caret-primary"
             placeholder="포켓몬 이름"
           />
           <button
             type="submit"
-            className="w-full p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70 lg:w-16 h-12 sm:w-auto"
+            disabled={Boolean(quizResult)}
+            className="w-full p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-primary hover:bg-primary/70 hover:shadow-primary/70 disabled:cursor-not-allowed disabled:bg-primary/40 lg:w-16 h-12 sm:w-auto"
           >
-            맞추기
+            잡기
           </button>
         </form>
+        <button
+          type="button"
+          onClick={() => finishQuiz("ended")}
+          disabled={Boolean(quizResult) || matchedCount === pokemons.length}
+          className="w-full h-12 p-2 font-bold text-[#FDFDFD] rounded-lg shadow-md bg-rose-600 hover:bg-rose-500 disabled:cursor-not-allowed disabled:bg-rose-600/40 sm:w-auto"
+        >
+          종료
+        </button>
         <div className="flex h-12 rounded-lg border border-slate-500 bg-slate-900/60 p-1">
           <div className="group relative">
             <button
@@ -208,8 +313,8 @@ export default function PokemonQuiz({
             isEasyMode && lightColor === "blue"
               ? "border-blue-500"
               : isEasyMode && lightColor === "red"
-              ? "border-red-500"
-              : "border-slate-400"
+                ? "border-red-500"
+                : "border-slate-400"
           }`}
         >
           {groupPokemons.map((group, groupIndex) => (
@@ -232,6 +337,54 @@ export default function PokemonQuiz({
           ))}
         </div>
       </div>
+      {quizResult && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-xl rounded-lg border border-slate-300/30 bg-slate-900/90 p-6 text-center shadow-4xl">
+            <h2 className="text-2xl font-bold text-primary">
+              {quizResult.type === "completed" ? "전부 잡았어요!" : "퀴즈 종료"}
+            </h2>
+            <div className="mt-4 grid grid-cols-3 gap-3 text-sm font-bold sm:text-base">
+              <div className="rounded-lg border border-slate-500 p-3">
+                <p className="text-slate-300">시간</p>
+                <p className="mt-1 text-primary">
+                  {formatElapsedTime(quizResult.elapsedSeconds)}
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-500 p-3">
+                <p className="text-slate-300">잡은 포켓몬</p>
+                <p className="mt-1 text-primary">
+                  {quizResult.matchedCount}마리
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-500 p-3">
+                <p className="text-slate-300">놓친 포켓몬</p>
+                <p className="mt-1 text-primary">{resultMissedCount}마리</p>
+              </div>
+            </div>
+            {resultMissedCount > 0 && (
+              <div className="mt-5 max-h-64 overflow-y-auto rounded-lg border border-slate-500 bg-slate-950/60 p-4 text-left">
+                <p className="mb-3 text-center font-bold text-[#FDFDFD]">
+                  놓친 포켓몬
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+                  {quizResult.missedPokemons.map((pokemon) => (
+                    <span key={pokemon.id}>
+                      #{pokemon.id} {pokemon.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleResetQuiz}
+              className="mt-6 h-12 rounded-lg bg-primary px-6 font-bold text-[#FDFDFD] shadow-md hover:bg-primary/70"
+            >
+              다시 하기
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
