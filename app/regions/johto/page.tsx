@@ -6,7 +6,7 @@ export default function Johto() {
     <div>
       <p className="m-8 lg:m-16 text-2xl md:text-4xl font-bold text-center">
         <ruby>
-          성동 지방
+          성도 지방
           <rt className="tracking-[.5em] text-primary">2세대</rt>
         </ruby>
         &nbsp;
