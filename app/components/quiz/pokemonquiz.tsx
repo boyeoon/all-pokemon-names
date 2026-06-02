@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { fetchPokemonData, PokeAPI } from "@/pokeapi";
 import Image from "next/image";
 import Toggle from "@/components/toggle/toggle";
-import Loading from "@/components/loading/loading";
 import Pokeball from "@/components/ball/pokeball";
 
 interface PokemonQuizProps {
@@ -13,53 +11,53 @@ interface PokemonQuizProps {
   regionPokemons: string[];
 }
 
+interface Pokemon {
+  id: number;
+  name: string;
+  sprite: string;
+}
+
 export default function PokemonQuiz({
   numPokemonsStr,
   numPokemonsEnd,
-  regionPokemons, // 지역 포켓몬 목록
+  regionPokemons,
 }: PokemonQuizProps) {
-  const [pokemons, setPokemons] = useState<PokeAPI[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [matchedCount, setMatchedCount] = useState(0);
-  const [sprites, setSprites] = useState<{ [key: string]: string }>({});
+  const [matchedPokemonIds, setMatchedPokemonIds] = useState<Set<number>>(
+    () => new Set()
+  );
   const [itemsPerRow, setItemsPerRow] = useState(3);
   const [showIds, setShowIds] = useState(true);
   const [showLights, setShowLights] = useState(true);
-  const [lightColor, setLightColor] = useState<string | null>(null); // 정답 불빛 색상 관리
-  const [isLoading, setIsLoading] = useState(true);
-  const lightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [lightColor, setLightColor] = useState<"blue" | "red" | null>(null);
+  const lightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Set으로 만들어 빠른 탐색 가능
-  const regionPokemonSet = useMemo(
-    () => new Set(regionPokemons.map((name) => name.toLowerCase())),
-    [regionPokemons]
+  const pokemons = useMemo<Pokemon[]>(() => {
+    const totalPokemons = numPokemonsEnd - numPokemonsStr + 1;
+
+    return regionPokemons.slice(0, totalPokemons).map((name, index) => {
+      const id = numPokemonsStr + index;
+
+      return {
+        id,
+        name,
+        sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
+      };
+    });
+  }, [numPokemonsStr, numPokemonsEnd, regionPokemons]);
+
+  const pokemonByName = useMemo(
+    () =>
+      new Map(
+        pokemons.map((pokemon) => [pokemon.name.toLowerCase(), pokemon])
+      ),
+    [pokemons]
   );
 
   useEffect(() => {
-    const loadPokemons = async () => {
-      setIsLoading(true);
-      const ids = Array.from(
-        { length: numPokemonsEnd - numPokemonsStr + 1 },
-        (_, i) => numPokemonsStr + i
-      );
-
-      const pokemonPromises = ids.map(async (id) => {
-        try {
-          return await fetchPokemonData(id);
-        } catch (e) {
-          console.warn(`포켓몬 #${id} 불러오기 실패`, e);
-          return null;
-        }
-      });
-
-      const results = await Promise.all(pokemonPromises);
-      const filtered = results.filter((p): p is PokeAPI => p !== null);
-      setPokemons(filtered);
-      setIsLoading(false);
-    };
-
-    loadPokemons();
-  }, [numPokemonsStr, numPokemonsEnd]);
+    setMatchedPokemonIds(new Set());
+    setInputValue("");
+  }, [pokemons]);
 
   useEffect(() => {
     const updateItemsPerRow = () => {
@@ -80,6 +78,12 @@ export default function PokemonQuiz({
     return () => window.removeEventListener("resize", updateItemsPerRow);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (lightTimeoutRef.current) clearTimeout(lightTimeoutRef.current);
+    };
+  }, []);
+
   const handleGuess = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -87,22 +91,17 @@ export default function PokemonQuiz({
 
       if (!trimmedInput) return;
 
-      const isMatched = regionPokemonSet.has(trimmedInput);
-      setLightColor(isMatched ? "blue" : "red");
-
-      if (isMatched) {
-        setMatchedCount((prev) => prev + 1);
-      }
-
-      const matchedPokemon = pokemons.find(
-        (pokemon) => pokemon.name === trimmedInput
-      );
+      const matchedPokemon = pokemonByName.get(trimmedInput);
+      setLightColor(matchedPokemon ? "blue" : "red");
 
       if (matchedPokemon) {
-        setSprites((prev) => ({
-          ...prev,
-          [matchedPokemon.id]: matchedPokemon.sprites.front_default,
-        }));
+        setMatchedPokemonIds((prev) => {
+          if (prev.has(matchedPokemon.id)) return prev;
+
+          const next = new Set(prev);
+          next.add(matchedPokemon.id);
+          return next;
+        });
       }
 
       setInputValue("");
@@ -110,7 +109,7 @@ export default function PokemonQuiz({
       if (lightTimeoutRef.current) clearTimeout(lightTimeoutRef.current);
       lightTimeoutRef.current = setTimeout(() => setLightColor(null), 500);
     },
-    [inputValue, pokemons, regionPokemonSet]
+    [inputValue, pokemonByName]
   );
 
   const groupPokemons = useMemo(() => {
@@ -121,6 +120,9 @@ export default function PokemonQuiz({
     return groups;
   }, [pokemons, itemsPerRow]);
 
+  const matchedCount = matchedPokemonIds.size;
+  const remainingCount = pokemons.length - matchedCount;
+
   return (
     <div className="p-4 md:p-8 lg:px-20">
       <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-x-8">
@@ -128,9 +130,7 @@ export default function PokemonQuiz({
           <p>
             <span>현재 {matchedCount}마리</span>
             <span> / </span>
-            <span>
-              앞으로 {numPokemonsEnd - numPokemonsStr + 1 - matchedCount}마리
-            </span>
+            <span>앞으로 {remainingCount}마리</span>
           </p>
         </div>
         <form onSubmit={handleGuess} className="flex w-full gap-4 sm:w-auto">
@@ -175,28 +175,24 @@ export default function PokemonQuiz({
               : "border-slate-400"
           }`}
         >
-          {isLoading ? (
-            <Loading />
-          ) : (
-            groupPokemons.map((group, groupIndex) => (
-              <div key={groupIndex} className="flex justify-around m-2">
-                {group.map((pokemon) => (
-                  <div key={pokemon.id} className="text-center">
-                    {sprites[pokemon.id] ? (
-                      <Image
-                        src={sprites[pokemon.id]}
-                        alt={pokemon.name}
-                        width={64}
-                        height={64}
-                      />
-                    ) : (
-                      <Pokeball id={pokemon.id} showId={showIds} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            ))
-          )}
+          {groupPokemons.map((group, groupIndex) => (
+            <div key={groupIndex} className="flex justify-around m-2">
+              {group.map((pokemon) => (
+                <div key={pokemon.id} className="text-center">
+                  {matchedPokemonIds.has(pokemon.id) ? (
+                    <Image
+                      src={pokemon.sprite}
+                      alt={pokemon.name}
+                      width={64}
+                      height={64}
+                    />
+                  ) : (
+                    <Pokeball id={pokemon.id} showId={showIds} />
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     </div>
